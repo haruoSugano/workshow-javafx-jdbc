@@ -1,18 +1,27 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.util.Alerts;
+import gui.util.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
@@ -36,8 +45,9 @@ public class DepartmentListController implements Initializable {
 	private ObservableList<Department> obsList;
 	
 	@FXML
-	public void onBtNewAction() {
-		System.out.println("OnBtnewAction");
+	public void onBtNewAction(ActionEvent event) {
+		Stage parentStage = Utils.currentStage(event);
+		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
 	}
 	
 	public void setDepartmentService(DepartmentService service) {
@@ -66,5 +76,24 @@ public class DepartmentListController implements Initializable {
 		List<Department> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDepartment.setItems(obsList);
+	}
+	
+	public void createDialogForm(String absoluteName, Stage parentStage) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load();
+			
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Enter Department data");//Titulo da janela
+			dialogStage.setScene(new Scene(pane));//Nova cena que sera o pane
+			dialogStage.setResizable(false);//A janela não poode ser redimensionada
+			dialogStage.initOwner(parentStage);//Quem será o pai desta janela
+			dialogStage.initModality(Modality.WINDOW_MODAL);//Restringindo o acesso, apenas na janela aberta.
+			dialogStage.showAndWait();//
+			
+		}
+		catch(IOException e) {
+			Alerts.showAlert("IO Exception", "Error Loading view", e.getMessage(), AlertType.ERROR);
+		}
 	}
 }
