@@ -116,7 +116,8 @@ public class SellerListController implements Initializable, DataChangeListener {
 			
 			SellerFormController controller = loader.getController();
 			controller.setSeller(obj);
-			controller.setSellerService(new SellerService());
+			controller.setService(new SellerService(), new DepartmentService());
+			controller.loadAssociatedObjects();
 			controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
 			
@@ -130,6 +131,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 			
 		}
 		catch(IOException e) {
+			e.getStackTrace();
 			Alerts.showAlert("IO Exception", "Error Loading view", e.getMessage(), AlertType.ERROR);
 		}
 	}
